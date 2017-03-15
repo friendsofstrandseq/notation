@@ -1,0 +1,175 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{cite}
+\usepackage{color}
+\usepackage[margin=1in,footskip=0.15in]{geometry}
+%\usepackage[]{algorithm2e}
+\usepackage{algorithm}
+% Need it for floating environment
+\usepackage[noend]{algpseudocode}
+% Hide endif .etc
+\usepackage{caption}
+% Need it for \caption*
+\usepackage{xspace}
+% Fix macro spacing bug
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsfonts}
+
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows}
+\tikzset{every picture/.style={font issue=\scriptsize},
+         font issue/.style={execute at begin picture={#1\selectfont}}}
+
+%-------------------------------------------------------------
+\usepackage{float}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode} 
+
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+
+\algnewcommand\algorithmicparameters{\textbf{Parameters:}}
+\algnewcommand\Parameters{\item[\algorithmicparameters]}
+\renewcommand{\thealgorithm}{\arabic{algorithm}}
+
+\algtext*{EndIf} % Remove "end if" text
+\algtext*{EndFor} % Remove "end for" text
+\algtext*{EndWhile} % Remove "end while" text
+\algtext*{EndFunction} % Remove "end function" text
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\renewcommand{\algorithmicensure}{\textbf{Parameters:}}
+%%----------------------------------------------------------
+%%Macros:
+\renewcommand{\c}{c} %copy
+\newcommand{\C}{\mathcal{C}} %copy set
+\newcommand{\CN}{N} %copy number random var
+\newcommand{\cn}{n} %copy number realization
+\renewcommand{\i}{v} %inversion
+\newcommand{\I}{\mathcal{V}} % inversion set
+\newcommand{\RC}{R} % read count
+\newcommand{\MC}{M} % mapped read count random var
+\newcommand{\mc}{m} % mapped read count realization
+\renewcommand{\d}{d} % direction
+\newcommand{\D}{\mathcal{D}} % direction set
+\newcommand{\Crick}{C}
+\newcommand{\Watson}{W}
+\newcommand{\chr}{k}
+\newcommand{\Chr}{\mathcal{K}}
+\newcommand{\h}{h} % haplotype
+\renewcommand{\H}{\mathcal{H}} % haplotype set
+\newcommand{\T}{T} % cell type random var
+\renewcommand{\t}{t} % cell type realization
+%%----------------------------------------------------------
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\title{Notations and the statistical model for read count of StrandSeq data}
+\author{Maryam Ghareghani, Tobias Marscall}
+
+\begin{document}
+
+\maketitle
+
+\section{Definitions and Notations}
+
+\begin{definition}[segment]
+A segment is a DNA sequence along which the status is constant. We define the status of a segment as the number of inverted and non-inverted copies of the segment in each chromosome and each haplotype.
+\end{definition}
+
+\begin{definition}
+A copy of a segment $s$ is defined as a substring of the genome such that the reads that map to segment $s$ also map to this substring, and vice versa. Let $\Chr$ be the set of chromosomes and $\H$ be the set of haplotypes, e.g., for a diploid human genome, $\Chr = \{1,2,\ldots, 22, X, Y\}$ and $\H = \{0,1\}$ (referring to maternal and paternal haplotypes). We define $\I = \{\rightarrow, \leftarrow\}$ as the set of inversion states of a copy where $\rightarrow$ and $\leftarrow$ refer to the inverted and non-inverted states, respectively. We denote the set of all copies of segment \textit{s} by $\C(s)$. For each copy $\c \in \C(s)$, we denote the chromosome and the haplotype in which this copy resides by $\chr_\c \in \Chr$ and $\h_\c \in \H$, respectively. We also denote the inversion status of copy \c with respect to segment \textit{s} by $\i_\c \in \I$.
+\end{definition}
+
+\begin{definition}
+We define $\D = \{\Crick,\Watson\}$ as the set of two possible directions, which can refer both to a type of a cell in a specific chromosome and haplotype and to the mapping direction of a read mapped to a segment.
+\end{definition}
+
+\subsection{Notations for random variables}
+
+The proposed notations for the status of each genomic segment, including the copy number and inversion status of that segment in each chromosome and each haplotype:\\ \\
+$\CN_s^{\chr,\h,\i} := $ The number of copies of segment $s$ in chromosome $\chr$ and haplotype $\h$, with inversion status $\i$ \\
+$\CN_s^{\chr,\h} := $ The number of copies of segment $s$ in chromosome $\chr$ and haplotype $\h$ \\
+$\CN_s^\chr := $ The number of copies of segment $s$ in chromosome $\chr$\\
+$\CN_s := $ The number of copies of segment $s$ in the whole genome \\ \\
+Let $\c \in \C(s)$. Notations for read counts:\\ \\
+$\RC_\c^{j,\d} := $ The number of reads from cell \textit{j} originating from copy $\c$, which map to segment \textit{s} in direction $\d \in \D$\\
+$\RC_\c^j := $ The number of reads from cell \textit{j} originating from copy $\c$ \\
+$\MC_s^{j,\d} := $ The number of reads from cell \textit{j} which are mapped to segment \textit{s} in direction $\d \in \D$\\
+$\MC_s^j := $ The number of reads from cell \textit{j} which are mapped to segment \textit{s}\\ \\
+Notation for type of cells:\\ \\
+$\T_{\chr,\h}^j := $ Type of cell \textit{j} in chromosome $\chr$. It can take two different values from the set $\D = \{\Crick,\Watson\}$.\\
+
+\section{Structural Variations with these notations}
+
+\begin{enumerate}
+\item \textbf{Normal (No SV):} Segment \textit{s} in chromosome $\chr$ is normal (has no SVs):\\
+$\CN_s = 2$, and $\CN_s^{\chr,0,\rightarrow} = \CN_s^{\chr,1,\rightarrow} = 1$
+
+\item \textbf{Heterozygous inversion:} One of the haplotypes, say mother haplotype, has an inversion in segment \textit{s} in chromosome $\chr$:\\
+$\CN_s = 2$, and $\CN_s^{\chr,0,\leftarrow} = \CN_s^{\chr,1,\rightarrow} = 1$
+
+\item \textbf{Translocation:} Say $s_1$ and $s_2$ are suffices of chromosomes $\chr_1$ and $\chr_2$, respectively. In translocation, segment $s_1$ in one haplotype, say mother haplotype, and segment $s_2$ in one haplotype, say mother haplotype, are exchanged. A necessary condition for this event is written here:\\
+$\CN_{s_1} = \CN_{s_2} = 2$, and $\CN_{s_1}^{\chr_2, 0, \rightarrow} = \CN_{s_2}^{\chr_1, 0, \rightarrow} = \CN_{s_1}^{\chr_1, 1, \rightarrow} = \CN_{s_2}^{\chr_2, 1, \rightarrow} = 1$\\
+We should also mention that these segments occur at the end of chromosomes after exchanging, which cannot be shown by our notations. We need to extend the notations to take the sequence into account.
+	
+\item \textbf{Duplication:} There is a (non-inverted) duplication of segment \textit{s} of chromosome $\chr$ of one of the haplotypes, say mother haplotype:\\
+$\CN_s = 3$, and ($\CN_s^{\chr,0,\rightarrow} = 2, \CN_s^{\chr,1,\rightarrow} = 1$, or
+$\CN_s^{\chr,0,\rightarrow} = \CN_s^{\chr,1,\rightarrow} = \sum \limits_{\chr' \in \Chr, \chr' \neq \chr} \CN_s^{\chr', 0, \rightarrow} = 1$)
+
+\item \textbf{Inverted duplication:} There is an inverted duplication of segment \textit{s} in chromosome $\chr$ in one of the haplotypes, say mother haplotype:\\
+$\CN_s = 3$, and $\CN_s^{\chr,0,\rightarrow} = \CN_s^{\chr,1,\rightarrow} = 1,$ and $\sum \limits_{\chr' \in \Chr} \CN_s^{\chr', 0, \leftarrow} = 1$
+
+\item \textbf{Tetraploidy:} One of the haplotypes, say mother haplotype, has three (instead of one) copies of chromosome $\chr$: (segment \textit{s} is equal to chromosome $\chr$ in this case)\\
+$\CN_s^{\chr,0} = 3,$ and $\CN_s^{\chr,1} = 1$
+
+\item \textbf{Deletion:} Copy $\c$ is deleted from chromosome $\chr$ of one haplotype, say mother haplotype:\\
+$\CN_s = \CN_s^{\chr,1,\rightarrow} = 1$
+
+\item \textbf{copy neutral LOH:} cannot be shown by these notations. We need to extend the notations to take the sequence into account.
+\end{enumerate}
+
+A statistical model can help us to discover structural variations and do haplotype phasing. For example, we can perform a hypothesis test for testing whether a segment has an structural variation. In this case, we can define the null hypothesis as the segment is normal, and then we can have a null distribution based on the statistical model and test whether the data has come from this distribution. Moreover, we can answer to some questions such as inferring the status of a segment or the relationship between different segments (e.g., being in the same chromosome), finding out how much statistical power we have in distinguishing between two different status, etc.
+
+\section{Statistical Model}
+
+We assume that the number of reads from cell \textit{j} sampled from a copy is a negative binomial (NB) random variable with parameters $r_j$ and $p$. More precisely, let $s$ be a segment and $\c \in \C(s)$. Then we have:
+$$
+\RC_\c^j \sim NB(r_j;p)
+$$
+Let $E_\c^{j,\d}$ be the event that (most of) the reads from cell \textit{j} originating from copy $\c \in \C(s)$ map to segment \textit{s} in direction $\d \in \D$. This event happens in one of these two conditions: the first condition is that \c is a non inverted copy of segment $s$ and the type of cell \textit{j} in chromosome $\chr_\c$ and haplotype $\h_\c$ is $\d$, and the second condition is that \c is an inverted copy of segment $s$ and the type of cell \textit{j} in chromosome $\chr_\c$ and haplotype $\h_\c$ is the opposite of $\d$. It can be written precisely as follows:
+$$
+E_\c^{j,\d} \equiv (\T_{\chr_\c,\h_\c}^j = \d \wedge \i_\c = \rightarrow) \vee (\T_{\chr_\c,\h_\c}^j \neq \d \wedge \i_\c = \leftarrow)
+$$
+let $\bar{\d} \in \D$ be the opposite direction of $\d$. Consider a constant real number $0 < \alpha < 1$. We assume that if the event $E_\c^{j,\d}$ happens, $\RC_\c^{j,\d}$ and $\RC_\c^{j,\bar{\d}}$ are negative binomial random variables with dispersion parameters $(1-\alpha) r_j$ and $\alpha r_j$ respectively. More formally, we assume that $\RC_\c^{j,\d} \sim NB(\alpha_s^{j,\d} r_j; p)$,in which $\alpha_s^{j,\d}$ is defined as follows:
+$$
+\alpha_s^{j,\d} = I(E_\c^{j,\d})(1-\alpha) + I(E_\c^{j,\bar{\d}})\alpha,
+$$
+where \textit{I} is the indicator function of an event.
+
+\subsection{Likelihoods of the observed read counts}
+Let \textit{n} be the number of cells. By the proposed statistical model, we can compute the probability of the observed read counts in a segment \textit{s}, given the status of segment \textit{s} and the type of cells. Suppose $\mc_s^{j,\d}$ and $\cn_s^{\chr,\h,\i}$ are non-negative integers, and $\t_{\chr,\h}^j \in \D$ (for all $1 \leq j \leq n$, $\d \in \D$, $\chr \in \Chr$, $\h \in \H$, and $\i \in \I$). We have:
+\begin{align}
+& \Pr\{\bigwedge \limits_{j \in \{1, \ldots, n\}, \d \in \D} \MC_s^{j,\d} = \mc_s^{j,\d} \mid (\bigwedge \limits_{\chr \in \Chr, \h \in \H, \i \in \I} \CN_s^{\chr,\h,\i} = \cn_s^{\chr,\h,\i}) \wedge (\bigwedge \limits_{\chr \in \Chr, \h \in \H} \T_{\chr,\h}^j = \t_{\chr,\h}^j)\} \nonumber \\
+= & \prod \limits_{j \in \{1, \ldots, n\}, \d \in \D} \Pr\{\MC_s^{j,\d} = \mc_s^{j,\d} \mid (\bigwedge \limits_{\chr \in \Chr, \h \in \H, \i \in \I} \CN_s^{\chr,\h,\i} = \cn_s^{\chr,\h,\i}) \wedge (\bigwedge \limits_{\chr \in \Chr, \h \in \H} \T_{\chr,\h}^j = \t_{\chr,\h}^j)\} \nonumber
+\end{align}
+Since each read mapped to segment \textit{s} originates from one of its copies, the following relations between the random variables hold, for all $1 \leq j \leq n$ and $\d \in \D$:
+\begin{align}
+& \MC_s^{j,\d} = \sum \limits_{\c \in \C(s)} \RC_\c^{j,\d} \nonumber
+\end{align}
+If we are given the status of segment \textit{s}, we know the chromosome, haplotype, and the inversion status of each copy in $\C(s)$. As mentioned in the beginning of this section, for every $\c \in \C(s)$, $1 \leq j \leq n$, and $\d \in \D$, we have $\RC_\c^{j,\d} \sim NB(\alpha_s^{j,\d}r_j;p)$ where $\alpha_s^{j,\d}$ can be computed based on $\chr_\c$, $\h_\c$, and $\i_s$, and the type of cell \textit{j}. Consequently, $\MC_s^{j,\d}$ is a sum of NB random variables with the same second parameter \textit{p}, and therefore it is an NB random variable with a second parameter \textit{p} and a dispersion parameter equal to the sum of dispersion parameters of random variables $\RC_\c^{j,\d}$. In summary, we have:
+\begin{align}
+\MC_s^{j,\d} \sim NB((\sum \limits_{\c \in \C(s)} \alpha_s^{j,\d}) r_j; p) \nonumber
+\end{align}
+
+\end{document}
