@@ -1,0 +1,177 @@
+
+% utf-8
+\documentclass[notes=hide]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{wasysym}
+\usepackage{alltt}
+\usepackage{bbm}
+\usepackage{stmaryrd}
+\usepackage{eurosym}
+\usepackage{amssymb}
+
+\usetheme{uds}
+
+\setbeamerfont{smallfont}{size=\small}
+\setbeamerfont{smallerfont}{size=\footnotesize}
+\setbeamerfont{smallestfont}{size=\scriptsize}
+\setbeamerfont{tinyfont}{size=\tiny}
+\setbeamerfont{largefont}{size=\large}
+\setbeamerfont{Largefont}{size=\LARGE}
+
+\newcommand\bluebox[2][uds@main]{{%
+  \setlength{\fboxsep}{0pt}%
+  \colorbox{#1}{#2\strut}%
+}}
+
+\def\Prob{\mbox{\bf P}}
+\newcommand{\OO}{\mathcal{O}}
+\newcommand{\N}{\mathbbm{N}}
+\newcommand{\R}{\mathbbm{R}}
+\newcommand{\len}[1]{{\vert #1 \vert}}
+\newcommand{\emptystring}{\varepsilon}
+\newcommand{\substr}[3]{#1[#2\ldots#3]}
+\newcommand{\suffix}[2]{{#1}[{#2}\ldots]}
+\newcommand{\prefix}[2]{{#1}[\ldots{#2}]}
+\newcommand{\chr}[2]{#1[#2]}
+\newcommand{\powset}[1]{2^{#1}}
+\newcommand{\pos}{\ensuremath{\texttt{\upshape pos}}}
+\newcommand{\lcp}{\ensuremath{\texttt{\upshape lcp}}}
+\newcommand{\cld}{\ensuremath{\texttt{\upshape cld}}}
+\newcommand{\rank}{\ensuremath{\texttt{\upshape rank}}}
+\newcommand{\bwt}{\ensuremath{\texttt{\upshape bwt}}}
+\newcommand{\bwtfind}{\ensuremath{\texttt{\upshape bwtfind}}}
+\newcommand{\Occ}{\ensuremath{\texttt{\upshape Occ}}}
+\newcommand{\less}{\ensuremath{\texttt{\upshape less}}}
+\newcommand{\type}{\ensuremath{\texttt{\upshape type}}}
+\newcommand{\lcpskip}{\ensuremath{\texttt{\upshape skip}}}
+\newcommand{\gap}{\ensuremath{\text{--}}}
+\newcommand{\iverl}{\llbracket}
+\newcommand{\iverr}{\rrbracket}
+\newcommand{\C}{\ensuremath{\texttt{\upshape C}}}
+
+\newcommand{\blackboard}[1]{
+\begin{block}<#1>{}
+\begin{center}
+\textbf{BLACK BOARD EXAMPLE}
+\end{center}
+\end{block}
+}
+
+\usepackage{listings} % ab Version 1.4 mit Python-Syntax-Highlighting!
+\definecolor{mygray}{gray}{.50}
+\lstset{language=Python,
+    basicstyle=\scriptsize\ttfamily,
+    stringstyle=\ttfamily\color{green},
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{mygray},
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    morekeywords=assert,
+    extendedchars=false,
+    showstringspaces=false,
+    frame=single
+    }
+\lstset{escapeinside={/*@}{@*/}}
+
+\newcommand{\captionslide}[1]{
+\begin{frame}
+\frametitle{\phantom{NONE}}
+\begin{center}
+\vspace{1cm}
+\usebeamerfont{Largefont}
+          {\bf\em #1}
+          \vspace{2cm}
+\end{center}
+\end{frame}
+}
+
+
+% \title[Haplotype Assembly]{Haplotyping and haplotype-aware genotyping}
+% \author[TM]{Tobias Marschall}
+% \date{May 7, 2018\\[1em]HGSVC @ CSHL}
+
+\begin{document}
+
+% \frame[plain]{\titlepage}
+
+\setbeamertemplate{footline}{\hfill\insertframenumber{}\hspace*{10pt}\vskip10pt}
+
+\begin{frame}{Recovery of single-cell calls}
+\usebeamerfont{smallerfont}{
+\begin{center}
+\begin{tabular}{rlll}
+\#callsets & region & type & cell \\
+       72  & chr11:0-4000000 & del & BM510x04\_PE20372 \\ 
+       54  & chr15:46000000-101991189 & del & BM510x04\_PE20333 \\ 
+       48  & chr18:76000000-80373285 & del & BM510x04\_PE20303 \\ 
+       36  & chr18:0-3000000 & del & BM510x3PE20474 \\ 
+       36  & chr3:0-52000000 & del & BM510x04\_PE20303 \\ 
+       33  & chr3:52000000-65000000 & idup & BM510x04\_PE20303 \\ 
+       15  & chr11:4000000-52000000 & idup & BM510x04\_PE20372 \\ 
+       15  & chr15:40000000-46000000 & idup & BM510x04\_PE20333 \\ 
+       15  & chr18:3000000-15000000 & idup & BM510x3PE20474 \\ 
+       12  & chr18:61000000-76000000 & idup & BM510x04\_PE20303 \\ 
+        3  & chr11:126000000-133000000 & idup & BM510x04\_PE20340 \\ 
+        0  & chr10:0-5000000 & del & BM510x04\_PE20370 \\
+        0  & chr10:5000000-7000000 & idup & BM510x04\_PE20370 \\
+        0  & chr11:133000000-135086622 & del & BM510x04\_PE20340 \\
+\end{tabular}
+\end{center}
+\emph{Left:} number of call set that recovered this variant (out of 72)\\
+\emph{Right:} coordinate range, type, and cell given in manually curated calls \\
+\emph{Criterion:} a call in the correct cell with the right type that overlaps ($\geq$ 1bp) with given range
+}
+\end{frame}
+
+\begin{frame}{Recovery of clonal calls}
+\usebeamerfont{smallerfont}{
+\begin{center}
+\begin{tabular}{rl}
+\#callsets & variant \\
+     72  &   chr13:0-114364328 (del)        \\
+     72  &   chr3:60000000-66000000 (dup)   \\
+     48  &   chr20:2000000-6000000 (del)    \\
+     12  &   chr12:23000000-27000000 (dup)  \\
+     12  &   chr9:20000000-24000000 (del)   \\
+      0  &   chr2:30000000-34000000 (idup)  \\
+      0  &   chr3:73000000-77000000 (idup)  \\
+      0  &   chr16:76000000-80000000 (dup)  \\
+      0  &   chr17:0-10000000 (inv)         \\
+      0  &   chr20:25000000-34000000 (idup) \\
+      0  &   chr21:3000000-13000000 (idup)  \\
+      0  &   chr22:35000000-50818468 (dup)  \\
+\end{tabular}
+\end{center}
+\emph{Left:} number of call set that recovered this variant (out of 72)\\
+\emph{Right:} coordinate range and type given in manually curated calls \\
+\emph{Criterion:} a call with AF$\geq$ 80\% and the right type that overlaps ($\geq$ 1bp) with given range
+}
+\end{frame}
+
+
+\begin{frame}{Notes on missed clonal calls}
+\usebeamerfont{smallerfont}{
+Callset 28:\\
+\texttt{100000\_fixed\_norm.selected\_j0.1\_s0.1/}\\
+\texttt{simpleCalls\_llr4\_poppriorsTRUE\_haplotagsFALSE\_gtcutoff0.05\_regfactor6}
+\hspace{-2em}
+\begin{tabular}{ll}
+call & comment  \\
+chr2:30000000-34000000 (idup) & called in individual cells, but rarely, too small\\
+chr3:73000000-77000000 (idup) & too small \\
+chr16:76000000-80000000 (dup) & called in 48/145 cells, clonality unclear \\
+chr17:0-10000000 (inv)        & messy, some SCE confusion \\
+chr20:25000000-34000000 (idup) & messy, multiple events?  \\
+chr21:3000000-13000000 (idup) & call INV in 54/145 cells, mostly blacklisted\\
+chr22:35000000-50818468 (dup) & fragmented and missed in a fraction of cells  \\
+                              & sometimes confused with idup due to missed SCE \\
+\end{tabular}
+}
+\end{frame}
+
+
+\end{document}
