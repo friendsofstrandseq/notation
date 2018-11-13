@@ -124,7 +124,7 @@ To sum up, every haplotype-resolved SV class ($\V$) in a segment together with t
 
 \begin{figure}
 	\begin{center}
-		\includegraphics[width=\textwidth]{graphical_model_v2_haplotagged-equal-sized-circle}
+		\includegraphics[width=\textwidth]{graphical_model_v3_haplotagged-equal-sized-circle}
 	\end{center}
 \caption{A plate notation representation of the graphical model for directional strand-seq read counts in genomic segments resulting from SV classes. Circles represent random variables, and squares show the model parameters. Gray and white objects show observed and latent (hidden) variables, respectively. $J$, $K$, and $H$ denote the set of single-cells, segments, and haplotypes. $\T_{\h,\k,\j}$ and $\V_{\h,\k,\j}$ respectively denote the strand state and the SV status of haplotype h in segment s in single-cell $\j$. $\N^W$ and $\N^C$ denote W and C copy numbers, and $\X^W$ and $\X^C$ denote W and C read counts, respectively. Note that the read counts are not observed (white circles inside the $H$ box) by their haplotypes, but they are observed with no haplotype information (white circles outside the $H$ box). A small fraction of the reads (determined by the heterozygosity parameter $h$) are observed by their haplotypes (tagged gray read count variables inside the $H$ box). $\alpha$ is the parameter showing the fraction of the background reads (noisy reads sampled from the opposite of the expected direction), and $p$ and $r$ are the $NB$ parameters, which are estmiated in mosaicatcher based on bin read counts.}
 \end{figure}
